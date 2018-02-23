@@ -7,6 +7,7 @@ app.get('/', function(req,res){
 });
 
 io.on('connection', function(socket){
+
   socket.on('new user', function(data, callback){
     if (nicknames.indexOf(data) != -1){
       callback(false);
@@ -14,7 +15,19 @@ io.on('connection', function(socket){
     else{
       callback(true);
       socket.nickname = data; // each user has own socket within the parent Socket
+      console.log(socket.nickname + " added");
       nicknames.push(socket.nickname);
+      io.sockets.emit('usernames', nicknames);
+    }
+  });
+
+io.on('disconnect', function(socket){
+    console.log('player left');
+    if(!socket.nickname){
+      return;
+    }
+    else{
+      nicknames.splice(nicknames.indexOf(socket.nickname), 1);
       io.sockets.emit('usernames', nicknames);
     }
   });
@@ -22,6 +35,7 @@ io.on('connection', function(socket){
   socket.on('chat message', function(msg){
     io.emit('chat message', msg);
   });
+
 });
 
 http.listen(3000, function(){

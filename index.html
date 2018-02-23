@@ -78,16 +78,6 @@
           $users.html(html);
         });
 
-        socket.on('disconnect', function(data){
-          if(!socket.nickname){
-            return;
-          }
-          else{
-            nicknames.splice(nicknames.indexOf(socket.nickname), 1);
-            io.sockets.emit('usernames', nicknames);
-          }
-        });
-
         var $nickForm =$('#setNick');
         var $users = $('#users');
         var $nickError = $('#nickError');
