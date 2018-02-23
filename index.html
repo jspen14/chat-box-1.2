@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Socket.IO Chat</title>
+    <style>
+    *{margin: 0; padding: 0; box-sizing: border-box;}
+    body{font: 13px Helvetica, Arial; }
+    form.chat{background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%;}
+    form input.chat{border: 0; padding: 10px; width: 90%; margin-right: .5%;}
+    form button.chat{width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px;}
+    #messages {list-style-type: none; margin 0; padding: 0;}
+    #messages li{
+      5px 10px;
+      text-align: center;
+      font-size: 20px;
+    }
+    #messsages li:nth-child(odd) {background: #eee;}
+    #chatWrap{
+      float: left;
+      border: 1px black solid;
+    }
+    #contentWrap{
+      display: none;
+    }
+    </style>
+  </head>
+  <body>
+
+    <div id="nickWrap">
+      <p>Enter a username:</p>
+      <p id="nickError"></p>
+      <form id="setNick" style="position: relative;">
+        <input size="35" id="nickname"> </input>
+        <input type="submit"> </input>
+      </form>
+    </div>
+
+    <div id="contentWrap">
+      <div id="chatWrap">
+        <ul id="messages">
+          <li>first message! :D</li>
+        </ul>
+        <form class="chat" action="">
+          <input class = "chat" id="m" autocomplete="off" /><button class="chat">Send</button>
+        </form>
+      </div>
+      <div id="users">
+
+      </div>
+    </div>
+
+
+
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+    jQuery(function($){
+
+      $(function() {
+        var socket = io();
+        $('form').submit(function(){
+          socket.emit('chat message', $('#m').val());
+          $('#m').val('');
+          return false;
+        });
+
+        socket.on('chat message', function(msg){
+          $('#messages').append($('<li>').text(msg));
+        });
+
+        socket.on('usernames', function(data){
+          var html = '';
+          for(i=0; i <data.length; i++){
+            html += data[i] + '<br/>'
+          }
+          $users.html(html);
+        });
+
+        socket.on('disconnect', function(data){
+          if(!socket.nickname){
+            return;
+          }
+          else{
+            nicknames.splice(nicknames.indexOf(socket.nickname), 1);
+            io.sockets.emit('usernames', nicknames);
+          }
+        });
+
+        var $nickForm =$('#setNick');
+        var $users = $('#users');
+        var $nickError = $('#nickError');
+        var $nickBox = $('#nickname')
+
+        $nickForm.submit(function(e){
+          e.preventDefault();
+          socket.emit('new user', $nickBox.val(), function(data){
+            if(data){
+              $('#nickWrap').hide();
+              $('#contentWrap').show();
+            }
+            else{
+              $nickError.html('That username is already taken! Try again.');
+            }
+          });
+          $nickBox.val('');
+        });
+
+      });
+    });
+    </script>
+  </body>
+</html>
