@@ -12,7 +12,7 @@
     #messages {list-style-type: none; margin 0; padding: 0;}
     #messages li{
       5px 10px;
-      text-align: center;
+      text-align: left;
       font-size: 20px;
     }
     #messsages li:nth-child(odd) {background: #eee;}
@@ -39,7 +39,6 @@
     <div id="contentWrap">
       <div id="chatWrap">
         <ul id="messages">
-          <li>first message! :D</li>
         </ul>
         <form class="chat" action="">
           <input class = "chat" id="m" autocomplete="off" /><button class="chat">Send</button>
@@ -48,6 +47,7 @@
       <div id="users">
 
       </div>
+
     </div>
 
 
@@ -66,8 +66,18 @@
           return false;
         });
 
-        socket.on('chat message', function(msg){
-          $('#messages').append($('<li>').text(msg));
+        socket.on('chat message', function(infoVar){
+          var msg = infoVar.message;
+          var name = infoVar.user;
+          // pass the users name into here and if the name passed in is equal to the name, then float right, else float left
+          // ** I also need to figure out the disconnection event.
+
+
+          if(name){
+            var retString = String(name) + ": ";
+            console.log(retString);
+            $('#messages').append($('<li>').text(retString + msg));
+          }
         });
 
         socket.on('usernames', function(data){

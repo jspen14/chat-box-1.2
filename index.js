@@ -1,7 +1,7 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var nicknames = [];
+var users = {};
 app.get('/', function(req,res){
   res.sendFile(__dirname + '/index.html');
 });
@@ -9,31 +9,37 @@ app.get('/', function(req,res){
 io.on('connection', function(socket){
 
   socket.on('new user', function(data, callback){
-    if (nicknames.indexOf(data) != -1){
+    if (data in users){
       callback(false);
     }
     else{
       callback(true);
       socket.nickname = data; // each user has own socket within the parent Socket
       console.log(socket.nickname + " added");
-      nicknames.push(socket.nickname);
-      io.sockets.emit('usernames', nicknames);
+      users[socket.nickname] = socket;
+      io.sockets.emit('usernames', Object.keys(users));
     }
   });
 
-io.on('disconnect', function(socket){
-    console.log('player left');
-    if(!socket.nickname){
+socket.on('disconnect', function(data){
+    if(!data){
       return;
     }
     else{
-      nicknames.splice(nicknames.indexOf(socket.nickname), 1);
-      io.sockets.emit('usernames', nicknames);
+      console.log(socket.nickname +' left');
+      delete users[socket.nickname];
+      io.sockets.emit('usernames', Object.keys(users));
     }
   });
 
   socket.on('chat message', function(msg){
-    io.emit('chat message', msg);
+    var infoVar={
+      message: msg.trim(),
+      user: socket.nickname
+    };
+
+    io.emit('chat message', infoVar);
+
   });
 
 });
