@@ -2,6 +2,8 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width = device=width, initial-scale = 1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <title>Socket.IO Chat</title>
     <style>
     *{margin: 0; padding: 0; box-sizing: border-box;}
@@ -14,6 +16,7 @@
       5px 10px;
       text-align: left;
       font-size: 20px;
+      color: white;
     }
     #messsages li:nth-child(odd) {background: #eee;}
     #chatWrap{
@@ -23,6 +26,50 @@
     #contentWrap{
       display: none;
     }
+
+    .gameBox{
+      max-width: 15vh;
+      max-width: 15vh;
+      max-height: 15vh;
+      min-height: 15vh;
+      background-color: green;
+      border: 3px solid black;
+      vertical-align: middle;
+      text-align: center;
+    }
+
+    .horizontalGameOption{
+      text-align: center;
+      margin-bottom: 1vh;
+    }
+
+    .verticalGameOption{
+    text-align: right;
+    }
+
+
+    .oponentHeader{
+      font-size: 4vh;
+      text-align: center;
+    }
+
+    .displayClients{
+      max-height: 30vh;
+      min-height: 30vh;
+      background-color: white;
+      border: 3px solid black;
+      font-size: 3vh;
+    }
+
+    .verticalButton{
+      display: table-cell;
+      vertical-align: middle;;
+    }
+
+    a{
+      color: black;
+    }
+
     </style>
   </head>
   <body>
@@ -36,17 +83,58 @@
       </form>
     </div>
 
-    <div id="contentWrap">
-      <div id="chatWrap">
-        <ul id="messages">
-        </ul>
-        <form class="chat" action="">
-          <input class = "chat" id="m" autocomplete="off" /><button class="chat">Send</button>
-        </form>
+  <div id="contentWrap">
+  <div class="container-fluid">
+    <div class="row">
+      <div class= "col-lg-6 col-md-1 col-sm-3 col-xs-3" style="background-color: white; min-height: 75vh;">
+        <div class="container-fluid">
+          <div class="row oponentHeader">
+            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>
+            <div class="col-lg-11 col-md-11 col-sm-11 col-xs-11" style="font-size: 2vh;">Your Opponent</div>
+            <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3"></div>
+            <div class="col-lg-2 col-md-5 col-sm-3 col-xs-3 horizontalGameOption"><button type="button" onclick="optionX()" class="btn btn-primary">X</button></div> <!--make this a button-->
+            <div class="col-lg-2 col-md-5 col-sm-3 col-xs-3 horizontalGameOption"><button type="button" onclick="optionY()" class="btn btn-primary">Y</button></div> <!--this is where the option divs need to be-->
+          </div>
+          <div class="row">
+            <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3 verticalGameOption">
+              <br><br>
+              <button type="button" onclick="optionA()" class="btn btn-primary verticalButton">A</button>
+            </div>
+            <div class="col-lg-5 col-md-5 col-sm-3 col-xs-3 gameBox" id="quadrantTWO"></div>
+            <div class="col-lg-5 col-md-5 col-sm-3 col-xs-3 gameBox" id="quadrantONE"></div>
+          </div>
+          <div class="row">
+            <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3 verticalGameOption">
+              <br><br>
+              <button type="button" onclick="optionB()" class="btn btn-primary verticalButton">B</button>
+            </div>
+
+            <div class="col-lg-5 col-md-5 col-sm-3 col-xs-3 gameBox" id="quadrantTHREE"></div>
+            <div class="col-lg-5 col-md-5 col-sm-3 col-xs-3 gameBox" id="quadrantFOUR"></div>
+          </div>
+        </div>
       </div>
-      <div id="users">
+    <div class= "col-lg-3 col-md-3 col-sm-3 col-xs-3" style="background-color: blue; min-height: 75vh;">
+      <div id="chatWrap">
+        <ul id="messages"></ul>
 
       </div>
+    </div>
+    <div class= "col-lg-3 col-md-3 col-sm-3 col-xs-3 displayClients" style="background-color: white; min-height: 75vh;">
+      <h1 style="text-align:center">Clients</h1>
+      <a href="#">Donald Trump</a>
+      <br>
+      <a href="#">Dale Carnegie</a>
+      <div id="users" ></div>
+    </div>
+  </div>
+</div>
+
+    <form class="chat" action="">
+      <input class = "chat" id="m" autocomplete="off" /><button class="chat">Send</button>
+    </form>
+
+
 
     </div>
 
@@ -56,8 +144,25 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
-    jQuery(function($){
 
+    function optionX(){
+      console.log("made it into optionX");
+      document.getElementById('quadrantTWO').style.backgroundColor = "red";
+    }
+    function optionY(){
+      console.log("made it into optionY");
+      document.getElementById('quadrantONE').style.backgroundColor = "yellow";
+    }
+    function optionA(){
+      console.log("made it into optionA");
+      document.getElementById('quadrantTHREE').style.backgroundColor = "black";
+    }
+    function optionB(){
+      console.log("made it into optionB");
+      document.getElementById('quadrantFOUR').style.backgroundColor = "gray";
+    }
+
+    jQuery(function($){
       $(function() {
         var socket = io();
         $('form').submit(function(){
