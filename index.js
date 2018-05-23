@@ -2,6 +2,7 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var users = {};
+
 app.get('/', function(req,res){
   res.sendFile(__dirname + '/index.html');
 });
@@ -9,6 +10,7 @@ app.get('/', function(req,res){
 io.on('connection', function(socket){
 
   socket.on('new user', function(data, callback){
+    console.log("data from socket: " + data);
     if (data in users){
       callback(false);
     }
@@ -35,8 +37,12 @@ socket.on('disconnect', function(data){
   socket.on('chat message', function(msg){
     var infoVar={
       message: msg.trim(),
-      user: socket.nickname
+      user: socket.nickname,
     };
+
+    console.log(users);
+
+    console.log("in chat message function" + msg);
 
     io.emit('chat message', infoVar);
 
@@ -45,5 +51,5 @@ socket.on('disconnect', function(data){
 });
 
 http.listen(3000, function(){
-  console.log('listening on *:3000');
+  console.log('listening on port 3000!');
 });
